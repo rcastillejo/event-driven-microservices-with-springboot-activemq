@@ -1,5 +1,8 @@
 package com.techshard.activemq.controller;
 
+import com.techshard.activemq.domain.Card;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.http.HttpStatus;
@@ -8,6 +11,7 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,6 +24,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/cards")
 public class CardsController {
+    private final Logger logger = LoggerFactory.getLogger(CardsController.class);
 
     @Autowired
     private Queue queue;
@@ -28,7 +33,7 @@ public class CardsController {
     private JmsTemplate jmsTemplate;
 
 
-    private List<String> cards;
+    private List<Card> cards;
 
     @PostConstruct
     public void init(){
@@ -36,10 +41,13 @@ public class CardsController {
     }
 
     @PostMapping("{card-id}")
-    public ResponseEntity<String> createCard(@PathVariable("card-id") final String cardId){
+    public ResponseEntity<String> createCard(@PathVariable("card-id") final String cardId,
+                                             @RequestBody Card body){
         jmsTemplate.convertAndSend(queue, cardId);
-        cards.add(cardId);
-        return new ResponseEntity(cardId, HttpStatus.OK);
+        body.setId(cardId);
+        cards.add(body);
+        logger.info("Card received {}={} ", cardId, body);
+        return new ResponseEntity(body, HttpStatus.OK);
     }
 
     @GetMapping
