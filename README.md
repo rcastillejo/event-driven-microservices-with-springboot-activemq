@@ -12,7 +12,7 @@ Apache Kafka, RabbitMQ, ActiveMQ
 Para nuestro caso, la comunicación de los microservicios se 
 implementará en colas de ActiveMQ
 
-![Demo Implementation](demo_implementation.png)
+![Demo Implementation](demo_implementation.PNG)
 
 Para ello, nuestros microservicios tendrían los siguientes roles:
 
